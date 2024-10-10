@@ -40,6 +40,19 @@ jobs:
             echo "region=${{ secrets.AWS_DEFAULT_REGION }}" >> ~/.aws/credentials
           fi
 
+      - name: Export AWS Environment Variables
+        run: |
+          echo "Exporting AWS credentials as environment variables..."
+          export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+          export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          if [ -n "${{ secrets.AWS_DEFAULT_REGION }}" ]; then
+            export AWS_DEFAULT_REGION=${{ secrets.AWS_DEFAULT_REGION }}
+          fi
+        shell: bash
+
+      - name: Verify AWS Credentials
+        run: aws sts get-caller-identity
+
       - name: Package Lambda Function
         run: |
           chmod +x package_lambda.sh
@@ -51,10 +64,26 @@ jobs:
           terraform_wrapper: false
 
       - name: Initialize Terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: terraform init
 
       - name: Plan Terraform Deployment
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: terraform plan
 
       - name: Apply Terraform Deployment
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
         run: terraform apply -auto-approve
+
+      - name: Display Terraform Version
+        run: terraform -version
+
