@@ -50,9 +50,6 @@ jobs:
           fi
         shell: bash
 
-      - name: Verify AWS Credentials
-        run: aws sts get-caller-identity
-
       - name: Package Lambda Function
         run: |
           chmod +x package_lambda.sh
