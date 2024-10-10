@@ -67,12 +67,3 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.lambda_logging.arn
 }
-
-variable "aws_region" {
-  description = "The AWS region to deploy to"
-  default     = "us-east-1"
-}
-
-variable "lambda_function_name" {
-  description = "The name of the Lambda function"
-}
