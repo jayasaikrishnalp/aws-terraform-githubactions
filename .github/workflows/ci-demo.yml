@@ -16,15 +16,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set Up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-
-      - name: Set Up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_wrapper: false
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
 
       - name: Set AWS Credentials File
         run: |
@@ -35,6 +31,14 @@ jobs:
           if [ -n "${{ secrets.AWS_DEFAULT_REGION }}" ]; then
             echo "region=${{ secrets.AWS_DEFAULT_REGION }}" >> ~/.aws/credentials
           fi
+
+      - name: Verify AWS Credentials
+        run: aws sts get-caller-identity
+
+      - name: Set Up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
 
       - name: Initialize Terraform
         run: terraform init
