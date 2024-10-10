@@ -26,5 +26,21 @@ jobs:
         with:
           terraform_wrapper: false
 
-      - name: Display Terraform Version
-        run: terraform -version
+      - name: Set AWS Credentials File
+        run: |
+          mkdir -p ~/.aws
+          echo "[default]" > ~/.aws/credentials
+          echo "aws_access_key_id=${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+          if [ -n "${{ secrets.AWS_DEFAULT_REGION }}" ]; then
+            echo "region=${{ secrets.AWS_DEFAULT_REGION }}" >> ~/.aws/credentials
+          fi
+
+      - name: Initialize Terraform
+        run: terraform init
+
+      - name: Plan Terraform Deployment
+        run: terraform plan
+
+      - name: Apply Terraform Deployment
+        run: terraform apply -auto-approve
