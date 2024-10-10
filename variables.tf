@@ -1,9 +1,9 @@
 variable "aws_region" {
-  description = "AWS region for the Lambda function"
+  description = "The AWS region to deploy to"
   default     = "us-east-1"
 }
 
 variable "lambda_function_name" {
-  description = "Name of the Lambda function"
-  default     = "example-python312-lambda-function"
+  description = "The name of the Lambda function"
+  default     = "example_lambda_function"
 }
