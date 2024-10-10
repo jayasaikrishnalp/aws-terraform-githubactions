@@ -40,6 +40,11 @@ jobs:
             echo "region=${{ secrets.AWS_DEFAULT_REGION }}" >> ~/.aws/credentials
           fi
 
+      - name: Package Lambda Function
+        run: |
+          chmod +x package_lambda.sh
+          ./package_lambda.sh
+
       - name: Set Up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
@@ -53,6 +58,3 @@ jobs:
 
       - name: Apply Terraform Deployment
         run: terraform apply -auto-approve
-
-      - name: Display Terraform Version
-        run: terraform -version
