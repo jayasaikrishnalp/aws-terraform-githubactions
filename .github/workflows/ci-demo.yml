@@ -21,8 +21,10 @@ jobs:
         with:
           node-version: '16'
 
-      - name: Install Dependencies
-        run: npm install
+      - name: Set Up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
 
-      - name: Run Tests
-        run: npm test
+      - name: Display Terraform Version
+        run: terraform -version
