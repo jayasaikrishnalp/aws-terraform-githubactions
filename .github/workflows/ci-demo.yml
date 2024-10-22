@@ -57,10 +57,11 @@ jobs:
           bandit -r . -f custom --msg-template "{abspath}:{line}: {severity}: {test_id}: {msg}" --exit-zero | tee bandit_results.txt
 
       - name: Upload SAST Results
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: sast-results
           path: bandit_results.txt
+          retention-days: 5
 
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
