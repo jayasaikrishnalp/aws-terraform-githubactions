@@ -1,4 +1,4 @@
-name: CI Demo
+name: CI Demo with SonarCloud, SAST, and Trivy
 
 on:
   push:
@@ -12,9 +12,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     environment: test
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all branches and tags
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -41,6 +44,33 @@ jobs:
             echo "AWS credentials validation failed."
             exit 1
           fi
+
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: SAST - Bandit Scan
+        run: |
+          pip install bandit
+          bandit -r . -f custom --msg-template "{abspath}:{line}: {severity}: {test_id}: {msg}" --exit-zero | tee bandit_results.txt
+
+      - name: Upload SAST Results
+        uses: actions/upload-artifact@v2
+        with:
+          name: sast-results
+          path: bandit_results.txt
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
 
       - name: Package Lambda Function
         run: |
