@@ -2,29 +2,29 @@ provider "aws" {
   region = var.aws_region
 }
 
-resource "aws_lambda_function" "example_lambda" {
-  filename      = "lambda_function.zip"
-  function_name = var.lambda_function_name
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "lambda_function.lambda_handler"
-  runtime       = "python3.12"
+# Use the existing lambda_execution_role
+data "aws_iam_role" "existing_lambda_role" {
+  name = "lambda_execution_role"
+}
 
+# Lambda function
+resource "aws_lambda_function" "example_lambda" {
+  filename         = "lambda_function.zip"
+  function_name    = var.lambda_function_name
+  role            = data.aws_iam_role.existing_lambda_role.arn
+  handler         = "lambda_function.lambda_handler"
+  runtime         = "python3.12"
   source_code_hash = filebase64sha256("lambda_function.zip")
 }
 
-resource "aws_iam_role" "lambda_role" {
-  name = "example_lambda_role"
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-west-2"
+}
 
-  assume_role_policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Action = "sts:AssumeRole"
-        Effect = "Allow"
-        Principal = {
-          Service = "lambda.amazonaws.com"
-        }
-      }
-    ]
-  })
+variable "lambda_function_name" {
+  description = "Name of the lambda function"
+  type        = string
+  default     = "example_lambda_function"
 }
