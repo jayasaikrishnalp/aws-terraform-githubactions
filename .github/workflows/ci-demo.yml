@@ -74,6 +74,10 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Package Lambda Function
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION || 'us-west-2' }}
         run: |
           chmod +x package_lambda.sh
           ./package_lambda.sh
